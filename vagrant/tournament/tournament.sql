@@ -9,23 +9,18 @@
 create table if not exists players (player_id smallserial primary key, name text);
 
 create table if not exists matches (match_id smallserial primary key, winner_id integer references players (player_id), loser_id integer references players (player_id));
--- 
--- create view wins as
--- select players.player_id, players.name, count(matches.winner_id) as wins
--- from players left join matches
--- on players.player_id = matches.winner_id
--- group by matches.winner_id
--- order by wins;
--- 
--- create view losses as
--- select players.player_id, players.name, count(matches.loser_id) as losses
--- from players left join matches
--- on players.player_id = matches.loser_id
--- group by matches.loser)id
--- order by losses;
--- 
--- create view standings as
--- select player_id, wins.name, wins.wins as matches_won, losses.losses + wins.wins as total_matches
--- from wins join losses
--- on wins.player_id = losses.player_id
--- order by matches_won;
+
+create or replace view wins_matches as
+select coalesce(wins.winner_id, losses.loser_id) as player_id, 
+	coalesce(wins.num_wins,0) as num_wins, 
+	coalesce((coalesce(losses.num_losses,0) + coalesce(wins.num_wins, 0)), 0) as num_matches from 
+	(select winner_id, count(*) as num_wins from matches group by winner_id) as wins 
+	full outer join 
+	(select loser_id, count(*) as num_losses from matches group by loser_id) as losses on 
+	wins.winner_id = losses.loser_id;
+
+create or replace view standings as
+select players.player_id, players.name, wins_matches.num_wins, wins_matches.num_matches from
+players left join wins_matches
+on players.player_id = wins_matches.player_id;
+

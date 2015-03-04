@@ -61,6 +61,8 @@ def registerPlayer(name):
     db.commit()
     db.close()
 
+def None_to_zero(x):
+    return x if x is not None else 0
 
 def playerStandings():
     """Returns a list of the players and their win records, sorted by wins.
@@ -75,6 +77,15 @@ def playerStandings():
         wins: the number of matches the player has won
         matches: the number of matches the player has played
     """
+    db = connect()
+    cursor = db.cursor()
+    query = "select * from standings"
+    cursor.execute(query)
+    rows = cursor.fetchall()
+    rows = [(r[0], r[1], None_to_zero(r[2]), None_to_zero(r[3])) for r in rows]
+    db.commit()
+    db.close()
+    return rows
 
 
 def reportMatch(winner, loser):
