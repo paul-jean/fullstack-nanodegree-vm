@@ -11,12 +11,12 @@ create table if not exists players (player_id smallserial primary key, name text
 create table if not exists matches (match_id smallserial primary key, winner_id integer references players (player_id), loser_id integer references players (player_id));
 
 create or replace view wins_matches as
-select coalesce(wins.winner_id, losses.loser_id) as player_id, 
-	coalesce(wins.num_wins,0) as num_wins, 
-	coalesce((coalesce(losses.num_losses,0) + coalesce(wins.num_wins, 0)), 0) as num_matches from 
-	(select winner_id, count(*) as num_wins from matches group by winner_id) as wins 
-	full outer join 
-	(select loser_id, count(*) as num_losses from matches group by loser_id) as losses on 
+select coalesce(wins.winner_id, losses.loser_id) as player_id,
+	coalesce(wins.num_wins, 0) as num_wins,
+	(coalesce(losses.num_losses, 0) + coalesce(wins.num_wins, 0)) as num_matches from
+	(select winner_id, count(*) as num_wins from matches group by winner_id) as wins
+	full outer join
+	(select loser_id, count(*) as num_losses from matches group by loser_id) as losses on
 	wins.winner_id = losses.loser_id;
 
 create or replace view standings as
