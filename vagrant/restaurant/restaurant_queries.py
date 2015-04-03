@@ -12,12 +12,12 @@ DBSession = sessionmaker(bind = engine)
 session = DBSession()
 
 def get_restaurants():
-    names = session.query(Restaurant.name).\
+    name_id = [(r.id, r.name) for r in \
+            session.query(Restaurant).\
             order_by(Restaurant.name).\
-            distinct(Restaurant.name).all()
-    for i in range(len(names)):
-        names[i] = names[i][0]
-    return names
+            distinct(Restaurant.name).\
+            group_by(Restaurant.name).all()]
+    return name_id
 
 def test():
     rs = get_restaurants()

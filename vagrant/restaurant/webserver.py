@@ -10,17 +10,34 @@ class webserverHandler(BaseHTTPRequestHandler):
                 self.send_header('Content-type', 'text/html')
                 self.end_headers()
 
-                restaurants = get_restaurants()
+                id_name = get_restaurants()
                 output = ""
                 output += "<html><body>"
                 output += "<h1>Restaurants in the db</h1>"
                 output += "<ul>"
-                for r in restaurants:
-                    output += "<li>%s</li>" % r
+                for (id, name) in id_name:
+                    output += \
+                    "<li>%s <a href=\"restaurant/%s/edit\">edit</a>\
+                    <a href=\"confirm-delete\">delete</a> </li>" % \
+                    (name, id)
                 output += "</ul>"
                 output += "</body></html>"
                 self.wfile.write(output)
                 return
+            else:
+                if self.path.endswith("/edit"):
+                    self.send_response(200)
+                    self.send_header('Content-type', 'text/html')
+                    self.end_headers()
+                    self.wfile.write("edit")
+                    return
+                else:
+                    if self.path.endswith("/confirm-delete"):
+                        self.send_response(200)
+                        self.send_header('Content-type', 'text/html')
+                        self.end_headers()
+                        self.wfile.write("confirm-delete")
+                        return
 
         except IOError:
             self.send_error(404, "File Not Found %s" % self.path)
