@@ -24,24 +24,40 @@ class webserverHandler(BaseHTTPRequestHandler):
                 output += "</body></html>"
                 self.wfile.write(output)
                 return
-            else:
-                if self.path.endswith("/edit"):
-                    self.send_response(200)
-                    self.send_header('Content-type', 'text/html')
-                    self.end_headers()
-                    self.wfile.write("edit")
-                    return
-                else:
-                    if self.path.endswith("/confirm-delete"):
-                        self.send_response(200)
-                        self.send_header('Content-type', 'text/html')
-                        self.end_headers()
-                        self.wfile.write("confirm-delete")
-                        return
+            elif self.path.endswith("/restaurants/new"):
+                self.send_response(200)
+                self.send_header('Content-type', 'text/html')
+                self.end_headers()
+                output = ""
+                output += "<html><body>"
+                output += "<h1>Add restaurant</h1>"
+                output += """
+                        <form action="cgi-bin/add_restaurant.cgi" method="post">
+                            <label for="rest_name">Name:</label>
+                            <input type="text" id="rest_name">
+                            <input type="submit" value="submit">
+                        </form>
+                        """
+                output += "</body></html>"
+                self.wfile.write(output)
+                return
+            elif self.path.endswith("/edit"):
+                self.send_response(200)
+                self.send_header('Content-type', 'text/html')
+                self.end_headers()
+                self.wfile.write("edit")
+                return
+            elif self.path.endswith("/confirm-delete"):
+                self.send_response(200)
+                self.send_header('Content-type', 'text/html')
+                self.end_headers()
+                self.wfile.write("confirm-delete")
+                return
 
         except IOError:
             self.send_error(404, "File Not Found %s" % self.path)
 
+'''
     def do_POST(self):
         try:
             self.send_response(301)
@@ -55,20 +71,21 @@ class webserverHandler(BaseHTTPRequestHandler):
             output += "<h2> Okay, how about this: </h2>"
             output += "<h1> %s </h1>" % messagecontent[0]
             output +=\
-            '''\
+            """\
             <form method='POST'
                 enctype='multipart/form-data'
                 action='/hello'>
                 <h2>What would you like me to say?</h2>
                 <input name="message" type="text" ><input type="submit" value="Submit">
             </form>\
-            '''
+            """
             output += "</body></html>"
             self.wfile.write(output)
             print output
             return
         except:
             pass
+'''
 
 
 def main():
