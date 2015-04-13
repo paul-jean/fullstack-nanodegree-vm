@@ -26,8 +26,25 @@ def add_restaurant(restaurant_name):
     session.commit()
 
 def restaurant_exists(restaurant_name):
-    found = session.query(Restaurant).filter_by(name = restaurant_name).all()
-    return len(found) >= 1
+    rest = session.query(Restaurant).filter_by(name = restaurant_name).all()
+    return len(rest) >= 1
+
+def restaurant_name(restaurant_id):
+    rest = session.query(Restaurant).filter_by(id = restaurant_id).one()
+    return rest.name
+
+def change_name(rest_id, new_name):
+    rest = session.query(Restaurant).filter_by(id = rest_id).one()
+    rest.name = new_name
+    session.add(rest)
+    session.commit()
+    return new_name
+
+def delete_restaurant(rest_id):
+    rest = session.query(Restaurant).filter_by(id = rest_id).one()
+    session.delete(rest)
+    session.commit()
+    return
 
 def test():
     rs = get_restaurants()
