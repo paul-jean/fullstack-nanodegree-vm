@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
@@ -14,26 +14,23 @@ Base.metadata.bind = engine
 DBSession = sessionmaker(bind = engine)
 session = DBSession()
 
-@app.route('/')
 @app.route('/restaurants/<int:restaurant_id>/')
 def menuItems(restaurant_id):
     rest = session.query(Restaurant).filter_by(id = restaurant_id).one()
     items = session.query(MenuItem).filter_by(restaurant_id = rest.id).all()
-    output = '<html><body>'
-    output += '<h1>%s</h1>' % rest.name
-    output += '... has %s items:' % len(items)
-    output += '<br><br>'
-    for i in items:
-        output += i.name
-        output += '<br>'
-        output += i.price
-        output += '<br>'
-        output += i.description
-        output += '<br>'
-        output += '<br>'
-    output += '<br>'
-    output += '</body></html>'
-    return output
+    return render_template("menu.html", restaurant=rest, items=items)
+
+@app.route("/restaurant/<int:rest_id>/new/")
+def newMenuItem(rest_id):
+    return "new menu item"
+
+@app.route("/restaurant/<int:rest_id>/<int:menu_id>/edit/")
+def editMenuItem(rest_id, menu_id):
+    return "edit menu item"
+
+@app.route("/restaurant/<int:rest_id>/<int:menu_id>/delete/")
+def deleteMenuItem(rest_id, menu_id):
+    return "delete menu item"
 
 if __name__ == '__main__':
     app.debug = True
