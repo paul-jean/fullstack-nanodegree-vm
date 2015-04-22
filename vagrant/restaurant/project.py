@@ -18,25 +18,33 @@ session = DBSession()
 def menuItems(rest_id):
     rest = session.query(Restaurant).filter_by(id = rest_id).one()
     items = session.query(MenuItem).filter_by(restaurant_id = rest.id).all()
-    return render_template("menu.html", restaurant=rest, items=items)
+    return render_template('menu.html', restaurant=rest, items=items)
 
-@app.route("/restaurant/<int:rest_id>/new/", methods = ['GET', 'POST'])
+@app.route('/restaurant/<int:rest_id>/new/', methods = ['GET', 'POST'])
 def newMenuItem(rest_id):
-    if request.method == "POST":
-        newItem = MenuItem(name = request.form["name"], restaurant_id = rest_id)
+    if request.method == 'POST':
+        newItem = MenuItem(name = request.form['name'], restaurant_id = rest_id)
         session.add(newItem)
         session.commit()
-        return redirect(url_for("menuItems", rest_id = rest_id))
+        return redirect(url_for('menuItems', rest_id = rest_id))
     else:
-        return render_template("new-menu-item.html", restaurant_id = rest_id)
+        return render_template('new-menu-item.html', restaurant_id = rest_id)
 
-@app.route("/restaurant/<int:rest_id>/<int:menu_id>/edit/")
+@app.route('/restaurant/<int:rest_id>/<int:menu_id>/edit/', methods = ['GET', 'POST'])
 def editMenuItem(rest_id, menu_id):
-    return "edit menu item"
+    editedItem = session.query(MenuItem).filter_by(id = menu_id).one()
+    if request.method == 'POST':
+        if request.form['name']:
+            editedItem.name = request.form['name']
+        session.add(editedItem)
+        session.commit()
+        return redirect(url_for('menuItems', rest_id = rest_id))
+    else:
+        return render_template('edit-menu-item.html', restaurant_id = rest_id, menu_id = menu_id, item = editedItem)
 
-@app.route("/restaurant/<int:rest_id>/<int:menu_id>/delete/")
+@app.route('/restaurant/<int:rest_id>/<int:menu_id>/delete/')
 def deleteMenuItem(rest_id, menu_id):
-    return "delete menu item"
+    return 'delete menu item'
 
 if __name__ == '__main__':
     app.debug = True
